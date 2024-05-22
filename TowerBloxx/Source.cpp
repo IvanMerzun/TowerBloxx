@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int timerInterval = 70;
+int timerInterval = 60;
 int size = 0;
 GLfloat windowWidth = 1000;
 GLfloat windowHeight = 1000;
@@ -211,6 +211,7 @@ bool leftKeyPressed = false;
 bool rightKeyPressed = false;
 bool Keydown = false;
 bool blockFalling = false;
+bool flage = true;
 
 vector<Cloud> cl = { Cloud(-80, 75, 20),
 Cloud(80, 40, 20),
@@ -348,6 +349,18 @@ void Timer(int value)
         
     }
 
+    if (blo.size() == 5)
+    {
+        flage = false;
+        blo.erase(blo.begin(), blo.end()-3);
+        blo[0].y_ = -windowHeight + 20;
+        blo[1].y_ = -windowHeight + 40;
+
+    }
+
+    
+
+
     // Перерисовываем сцену
     glutPostRedisplay();
 
@@ -386,11 +399,23 @@ void RenderScene(void)
     case GAME:
         if (!blo.empty())
         {
-            blo[0].drawentrance(); 
-            for (size_t i = 1; i < blo.size(); ++i)
+            if (flage)
             {
-                blo[i].drawhouse(); 
+                blo[0].drawentrance();
+                for (size_t i = 1; i < blo.size(); ++i)
+                {
+                    blo[i].drawhouse();
+                }
             }
+            else
+            {
+                for (size_t i = 0; i < blo.size(); ++i)
+                {
+                    blo[i].drawhouse();
+                }
+            }
+            
+            
         }
         break;
 
