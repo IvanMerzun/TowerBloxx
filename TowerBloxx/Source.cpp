@@ -7,10 +7,12 @@
 
 using namespace std;
 
-int timerInterval = 30;
+int timerInterval = 70;
 int size = 0;
 GLfloat windowWidth = 1000;
 GLfloat windowHeight = 1000;
+
+int counter = 0;
 
 class Cloud
 {
@@ -207,6 +209,8 @@ public:
 
 bool leftKeyPressed = false;
 bool rightKeyPressed = false;
+bool Keydown = false;
+bool blockFalling = false;
 
 vector<Cloud> cl = { Cloud(-80, 75, 20),
 Cloud(80, 40, 20),
@@ -256,20 +260,28 @@ MenuState currentMenuState = MAIN_MENU;
 
 void HandleSpecialKeyDown(int key, int x, int y) 
 {
-    switch (key) {
+    switch (key) 
+    {
     case GLUT_KEY_LEFT:
-        leftKeyPressed = true;
+        if (!blockFalling) // Проверяем, падает ли блок
+            leftKeyPressed = true;
         break;
     case GLUT_KEY_RIGHT:
-        rightKeyPressed = true;
+        if (!blockFalling) // Проверяем, падает ли блок
+            rightKeyPressed = true;
+        break;
+    case GLUT_KEY_DOWN:
+        Keydown = true;
         break;
     }
+    
     glutPostRedisplay();
 }
 
 void HandleSpecialKeyUp(int key, int x, int y) 
 {
-    switch (key) {
+    switch (key)
+    {
     case GLUT_KEY_LEFT:
         leftKeyPressed = false;
         break;
@@ -292,10 +304,13 @@ void Timer(int value)
 
     if (blo.empty()) 
     {
-        // Создаем новый блок и добавляем его в вектор
+        Bloxx fund(-10, -windowHeight + 20, 20, 1.0f, 0.0f, 0.0f);
+        blo.push_back(fund);
         Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
         blo.push_back(newBlock);
     }
+
+
 
     if (leftKeyPressed || rightKeyPressed) 
     {
@@ -309,6 +324,29 @@ void Timer(int value)
         }
     }
 
+    if (Keydown)
+    {
+        blockFalling = true;
+        --blo.back().y_;
+        if (blo.back().y_ - 20 ==  blo[blo.size()-2].y_)
+        {
+            if (blo.back().x_ + (blo.back().width_) / 2 >= blo[blo.size() - 2].x_ && blo.back().x_ + (blo.back().width_) / 2 <= blo[blo.size() - 2].x_ + 20)
+            {
+                Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
+                blo.push_back(newBlock);
+                Keydown = false;
+                blockFalling = false;
+                ++counter;
+            }
+            else
+            {
+                cout << "You lose!" << endl;
+                cout << "You count: " << counter << endl;
+                exit(0);
+            }
+        }
+        
+    }
 
     // Перерисовываем сцену
     glutPostRedisplay();
@@ -337,8 +375,7 @@ void RenderScene(void)
     Button button1(-10, 5, 20, 5, 0.5f, 0.5f, 0.5f, "START");
     Button button2(-10, -1, 20, 5, 0.5f, 0.5f, 0.5f, "QUIT");
 
-    Bloxx fund(-10, -windowHeight+20, 20, 1.0f, 0.0f, 0.0f);
-
+   
     
     switch (currentMenuState)
     {
@@ -347,10 +384,13 @@ void RenderScene(void)
         button2.Draw();
         break;
     case GAME:
-        fund.drawentrance();
-        for (auto& b : blo)
+        if (!blo.empty())
         {
-            b.drawhouse();
+            blo[0].drawentrance(); 
+            for (size_t i = 1; i < blo.size(); ++i)
+            {
+                blo[i].drawhouse(); 
+            }
         }
         break;
 
@@ -364,7 +404,7 @@ void HandleMouseClick(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
-        //cout << x << " " << y << endl;
+        
 
         switch (currentMenuState)
         {
