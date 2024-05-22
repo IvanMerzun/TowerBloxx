@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int timerInterval = 200;
+int timerInterval = 30;
 int size = 0;
 GLfloat windowWidth = 1000;
 GLfloat windowHeight = 1000;
@@ -130,7 +130,30 @@ public:
     }
     void drawhouse()
     {
-        int x;
+        glColor3f(color_r_, color_g_, color_b_);
+        glBegin(GL_QUADS);
+        glVertex2f(x_, y_);
+        glVertex2f(x_ + width_, y_);
+        glVertex2f(x_ + width_, y_ - width_);
+        glVertex2f(x_, y_ - width_);
+        glEnd();
+
+
+        GLfloat winWidth = width_ / 3.0f;
+        GLfloat winHeight = width_;
+        GLfloat winX = x_ + (width_ / 2) - (winWidth / 2);
+        GLfloat winY = y_;
+
+        // Заливка между горизонтальными линиями
+        glColor3f(0.0f, 0.0f, 0.5f); // Белый цвет для заливки
+        glBegin(GL_QUADS);
+        glVertex2f(winX, winY);
+        glVertex2f(winX + winWidth, winY);
+        glVertex2f(winX + winWidth, winY - winHeight);
+        glVertex2f(winX, winY - winHeight);
+        glEnd();
+
+       
     }
     void drawroof()
     {
@@ -182,17 +205,23 @@ public:
 
 };
 
+bool leftKeyPressed = false;
+bool rightKeyPressed = false;
 
 vector<Cloud> cl = { Cloud(-80, 75, 20),
 Cloud(80, 40, 20),
 Cloud(-80, -10, 20),
 Cloud(80, -60, 20) };
 
+vector<Bloxx> blo;
+
 
 void RenderScene(void);
 void SetupRC(void);
 void ChangeSize(int, int);
 void HandleMouseClick(int button, int state, int x, int y);
+void HandleSpecialKeyDown(int key, int x, int y);
+void HandleSpecialKeyUp(int key, int x, int y);
 void Timer(int value);
 
 
@@ -206,8 +235,11 @@ void main(int argc, char* argv[])
     glutCreateWindow("Tower Bloxx");
     glutDisplayFunc(RenderScene);
     glutReshapeFunc(ChangeSize);
+    glutSpecialFunc(HandleSpecialKeyDown);
+    glutSpecialUpFunc(HandleSpecialKeyUp);
     glutMouseFunc(HandleMouseClick);
     glutTimerFunc(timerInterval, Timer, 0);
+
     SetupRC();
     glutMainLoop();
 }
@@ -220,6 +252,36 @@ enum MenuState
 
 MenuState currentMenuState = MAIN_MENU;
 
+
+
+void HandleSpecialKeyDown(int key, int x, int y) 
+{
+    switch (key) {
+    case GLUT_KEY_LEFT:
+        leftKeyPressed = true;
+        break;
+    case GLUT_KEY_RIGHT:
+        rightKeyPressed = true;
+        break;
+    }
+    glutPostRedisplay();
+}
+
+void HandleSpecialKeyUp(int key, int x, int y) 
+{
+    switch (key) {
+    case GLUT_KEY_LEFT:
+        leftKeyPressed = false;
+        break;
+    case GLUT_KEY_RIGHT:
+        rightKeyPressed = false;
+        break;
+    }
+    glutPostRedisplay();
+}
+
+
+
 void Timer(int value)
 {
     // Обновляем позиции облаков
@@ -228,12 +290,34 @@ void Timer(int value)
         c.moveCloud();
     }
 
+    if (blo.empty()) 
+    {
+        // Создаем новый блок и добавляем его в вектор
+        Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
+        blo.push_back(newBlock);
+    }
+
+    if (leftKeyPressed || rightKeyPressed) 
+    {
+        if (leftKeyPressed) 
+        {
+            blo.back().x_ -= 2.0f; 
+        }
+        if (rightKeyPressed) 
+        {
+            blo.back().x_ += 2.0f; 
+        }
+    }
+
+
     // Перерисовываем сцену
     glutPostRedisplay();
 
     // Устанавливаем таймер снова
     glutTimerFunc(timerInterval, Timer, 0);
 }
+
+
 
 void RenderScene(void)
 {
@@ -250,15 +334,12 @@ void RenderScene(void)
 
 
 
-
     Button button1(-10, 5, 20, 5, 0.5f, 0.5f, 0.5f, "START");
     Button button2(-10, -1, 20, 5, 0.5f, 0.5f, 0.5f, "QUIT");
 
     Bloxx fund(-10, -windowHeight+20, 20, 1.0f, 0.0f, 0.0f);
 
-
-
-
+    
     switch (currentMenuState)
     {
     case MAIN_MENU:
@@ -267,6 +348,10 @@ void RenderScene(void)
         break;
     case GAME:
         fund.drawentrance();
+        for (auto& b : blo)
+        {
+            b.drawhouse();
+        }
         break;
 
 
