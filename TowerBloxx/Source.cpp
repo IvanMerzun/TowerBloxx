@@ -302,6 +302,7 @@ void ChangeSize(int width, int height)
     }
 
     cout << 1;
+    cout << 2;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
