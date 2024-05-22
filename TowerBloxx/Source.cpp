@@ -352,14 +352,21 @@ void Timer(int value)
                     counter = 0;
                     currentMenuState = MAIN_MENU;
                 }
-                if (counter == 9)
+                else if (counter == 9)
                 {
                     roof = true;
+                    Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
+                    blo.push_back(newBlock);
+                    Keydown = false;
+                    blockFalling = false;
                 }
-                Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
-                blo.push_back(newBlock);
-                Keydown = false;
-                blockFalling = false;
+                else
+                {
+                    Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
+                    blo.push_back(newBlock);
+                    Keydown = false;
+                    blockFalling = false;
+                }
                 
             }
             else
@@ -415,7 +422,7 @@ void RenderScene(void)
 
 
     Button button1(-10, 5, 20, 5, 0.5f, 0.5f, 0.5f, "START");
-    Button button2(-10, -1, 20, 5, 0.5f, 0.5f, 0.5f, "QUIT");
+    Button button2(-10, -1, 20, 5, 0.5f, 0.5f, 0.5f, "EXIT");
 
    
     
