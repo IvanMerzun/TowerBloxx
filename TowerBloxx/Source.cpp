@@ -91,6 +91,54 @@ public:
 };
 
 
+class Bloxx
+{
+public:
+    GLfloat x_;
+    GLfloat y_;
+    GLfloat width_;
+    GLfloat color_r_;
+    GLfloat color_g_;
+    GLfloat color_b_;
+
+    Bloxx() = default;
+    Bloxx(GLfloat x, GLfloat y, GLfloat width, GLfloat r, GLfloat g, GLfloat b) :
+        x_(x), y_(y), width_(width), color_r_(r), color_g_(g), color_b_(b) {}
+
+    void drawentrance()
+    {
+        glColor3f(color_r_, color_g_, color_b_);
+        glBegin(GL_QUADS);
+        glVertex2f(x_, y_);
+        glVertex2f(x_ + width_, y_);
+        glVertex2f(x_ + width_, y_ - width_);
+        glVertex2f(x_, y_ - width_);
+        glEnd();
+
+        GLfloat doorWidth = width_ / 3.0f;
+        GLfloat doorHeight = width_ * 0.8f;
+        GLfloat doorX = x_ + (width_/2) - (doorWidth/2);
+        GLfloat doorY = y_ - (width_-doorHeight);
+
+        glColor3f(0.0f, 0.0f, 0.0f); // Черный цвет для двери
+        glBegin(GL_QUADS);
+        glVertex2f(doorX, doorY);
+        glVertex2f(doorX + doorWidth, doorY);
+        glVertex2f(doorX + doorWidth, doorY - doorHeight);
+        glVertex2f(doorX, doorY - doorHeight);
+        glEnd();
+    }
+    void drawhouse()
+    {
+        int x;
+    }
+    void drawroof()
+    {
+        int x;
+    }
+};
+
+
 class Button
 {
 public:
@@ -119,10 +167,7 @@ public:
 
         glColor3f(0.0f, 0.0f, 0.0f);
 
-        //GLfloat tx = (windowWidth + x_) / 2 - 3;
-
-
-        // Calculate the position to center the text horizontally
+       
         GLfloat tx = x_ + 6;
         GLfloat ty = y_ - height_ / 2.0f;
 
@@ -209,6 +254,8 @@ void RenderScene(void)
     Button button1(-10, 5, 20, 5, 0.5f, 0.5f, 0.5f, "START");
     Button button2(-10, -1, 20, 5, 0.5f, 0.5f, 0.5f, "QUIT");
 
+    Bloxx fund(-10, -windowHeight+20, 20, 1.0f, 0.0f, 0.0f);
+
 
 
 
@@ -219,6 +266,7 @@ void RenderScene(void)
         button2.Draw();
         break;
     case GAME:
+        fund.drawentrance();
         break;
 
 
