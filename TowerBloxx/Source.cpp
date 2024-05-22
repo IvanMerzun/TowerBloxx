@@ -159,7 +159,13 @@ public:
     }
     void drawroof()
     {
-        int x;
+        glColor3f(color_r_, color_g_, color_b_);
+        glBegin(GL_TRIANGLES);
+        
+        glVertex2f(x_ + (width_ / 2), y_);
+        glVertex2f(x_, y_ - width_);
+        glVertex2f(x_ + width_, y_ - width_);
+        glEnd();
     }
 };
 
@@ -212,6 +218,7 @@ bool rightKeyPressed = false;
 bool Keydown = false;
 bool blockFalling = false;
 bool flage = true;
+bool roof = false;
 
 vector<Cloud> cl = { Cloud(-80, 75, 20),
 Cloud(80, 40, 20),
@@ -333,17 +340,39 @@ void Timer(int value)
         {
             if (blo.back().x_ + (blo.back().width_) / 2 >= blo[blo.size() - 2].x_ && blo.back().x_ + (blo.back().width_) / 2 <= blo[blo.size() - 2].x_ + 20)
             {
+                ++counter;
+                if (counter == 10)
+                {
+                    cout << "YOU WIN!!!!!!!!" << endl;
+                    blo.clear();
+                    roof = false;
+                    flage = true;
+                    Keydown = false;
+                    blockFalling = false;
+                    counter = 0;
+                    currentMenuState = MAIN_MENU;
+                }
+                if (counter == 9)
+                {
+                    roof = true;
+                }
                 Bloxx newBlock(-windowWidth, windowHeight, 20, 1.0f, 0.0f, 0.0f);
                 blo.push_back(newBlock);
                 Keydown = false;
                 blockFalling = false;
-                ++counter;
+                
             }
             else
             {
                 cout << "You lose!" << endl;
                 cout << "You count: " << counter << endl;
-                exit(0);
+                blo.clear();
+                roof = false;
+                flage = true;
+                Keydown = false;
+                blockFalling = false;
+                counter = 0;
+                currentMenuState = MAIN_MENU;
             }
         }
         
@@ -409,9 +438,20 @@ void RenderScene(void)
             }
             else
             {
-                for (size_t i = 0; i < blo.size(); ++i)
+                if (roof)
                 {
-                    blo[i].drawhouse();
+                    for (size_t i = 0; i < blo.size()-1; ++i)
+                    {
+                        blo[i].drawhouse();
+                    }
+                    blo[blo.size() - 1].drawroof();
+                }
+                else
+                {
+                    for (size_t i = 0; i < blo.size(); ++i)
+                    {
+                        blo[i].drawhouse();
+                    }
                 }
             }
             
